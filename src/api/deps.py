@@ -6,7 +6,6 @@ from src.connections.database import get_db
 from src.core.security import decode_access_token
 from src.models.user import User
 
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 security = HTTPBearer()
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)) -> User:
