@@ -14,5 +14,5 @@ class Venue(Base):
     total_capacity = Column(Integer, nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
-    # seats = relationship("Seat", back_populates="venue")
+    seats = relationship("Seat", back_populates="venue")
     # events = relationship("Event", back_populates="venue")

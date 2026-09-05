@@ -4,11 +4,13 @@ from sqlalchemy.orm import Session
 from src.models.venue import Venue
 from src.repository.venue_repository import VenueRepository
 from src.schemas.venue import VenueCreateRequest, VenueUpdateRequest
+from src.repository.seat_repository import SeatRepository
 
 
 class VenueService:
     def __init__(self, db: Session):
         self.repo = VenueRepository(db)
+        self.seat_repo = SeatRepository(db)
 
     def list_all(self) -> list[Venue]:
         return self.repo.list_all()
@@ -32,3 +34,7 @@ class VenueService:
     def delete(self, venue_id: int) -> None:
         venue = self.get_by_id(venue_id)
         self.repo.delete(venue)
+
+    def list_seats(self, venue_id: int):
+        self.get_by_id(venue_id) #404 if missing
+        return self.seat_repo.list_by_venue(venue_id)

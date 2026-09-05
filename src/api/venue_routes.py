@@ -5,6 +5,7 @@ from src.api.deps import get_db
 from src.core.permissions import require_role
 from src.models.user import User, UserRole
 from src.schemas.venue import VenueCreateRequest, VenueUpdateRequest, VenueResponse
+from src.schemas.seat import SeatResponse
 from src.services.venue_service import VenueService
 
 router = APIRouter(prefix="/api/venues", tags=["Venues"])
@@ -47,3 +48,7 @@ def delete_venue(
 ):
     VenueService(db).delete(venue_id)
 
+
+@router.get("/{venue_id}/seats", response_model=list[SeatResponse])
+def list_venue_seats(venue_id: int, db: Session = Depends(get_db)):
+    return VenueService(db).list_seats(venue_id)
