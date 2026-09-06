@@ -5,6 +5,8 @@ from src.models.seat import Seat
 from src.models.event import Event
 from src.models.event_session import EventSession
 from src.models.session_seat import SessionSeat
+from src.models.reservation import Reservation
+from src.models.reservation_item import ReservationItem
 
 __all__ = [
     "User",
@@ -13,5 +15,7 @@ __all__ = [
     "Seat",
     "Event",
     "EventSession",
-    "SessionSeat"
+    "SessionSeat",
+    "Reservation",
+    "ReservationItem"
 ]
