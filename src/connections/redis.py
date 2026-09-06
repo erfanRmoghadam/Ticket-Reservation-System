@@ -2,7 +2,7 @@ import redis
 
 from src.config import settings
 
-redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True, protocol=2,)
 
 
 def get_redis():

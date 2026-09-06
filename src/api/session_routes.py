@@ -25,6 +25,11 @@ def get_session(session_id: int, db: Session = Depends(get_db)):
     return SessionService(db).get_by_id(session_id)
 
 
+@router.get("/{event_id}/sessions", response_model=list[SessionResponse])
+def list_event_sessions(event_id: int, db: Session = Depends(get_db)):
+    return SessionService(db).list_by_event(event_id)
+
+
 @router.put("/sessions/{session_id}", response_model=SessionResponse)
 def update_session(
     session_id: int,
@@ -43,3 +48,7 @@ def delete_session(
 ):
     SessionService(db).delete(session_id, current_user)
 
+
+@router.get("/sessions/{session_id}/seats", response_model=list[SessionSeatResponse])
+def get_session_seat_map(session_id: int, db: Session = Depends(get_db)):
+    return SessionService(db).get_seat_map(session_id)
