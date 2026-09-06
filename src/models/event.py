@@ -16,7 +16,7 @@ class Event(Base):
     cover_image_url = Column(Text, nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
-    # sessions = relationship("EventSession", back_populates="event", cascade="all, delete-orphan")
+    sessions = relationship("EventSession", back_populates="event", cascade="all, delete-orphan")
     organizer = relationship("User", back_populates="events")
     category = relationship("Category", back_populates="events")
     venue = relationship("Venue", back_populates="events")

@@ -20,4 +20,4 @@ class Seat(Base):
     seat_type = Column(String(20), default=SeatType.NORMAL)
 
     venue = relationship("Venue", back_populates="seats")
-    # session_seats = relationship("SessionSeat", back_populates="seat")
+    session_seats = relationship("SessionSeat", back_populates="seat")
