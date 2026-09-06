@@ -21,5 +21,5 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
-    # events = relationship("Event", back_populates="organizer")
+    events = relationship("Event", back_populates="organizer")
     # reservations = relationship("Reservation", back_populates="user")

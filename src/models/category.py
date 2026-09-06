@@ -11,4 +11,4 @@ class Category(Base):
     name = Column(String(100), nullable=False, unique=True)
     description = Column(Text, nullable=True)
 
-    # events = relationship("Event", back_populates="category")
+    events = relationship("Event", back_populates="category")

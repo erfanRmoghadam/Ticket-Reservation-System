@@ -15,4 +15,4 @@ class Venue(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     seats = relationship("Seat", back_populates="venue")
-    # events = relationship("Event", back_populates="venue")
+    events = relationship("Event", back_populates="venue")

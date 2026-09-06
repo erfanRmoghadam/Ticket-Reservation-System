@@ -5,6 +5,7 @@ from src.api.user_routes import router as user_route
 from src.api.category_routes import router as category_route
 from src.api.venue_routes import router as venue_route
 from src.api.seat_routes import router as seat_route
+from src.api.event_routes import router as event_route
 
 app = FastAPI(
     title="Ticket Reservation System",
@@ -16,6 +17,7 @@ app.include_router(user_route)
 app.include_router(category_route)
 app.include_router(venue_route)
 app.include_router(seat_route)
+app.include_router(event_route)
 
 @app.get("/health", tags=["Health"])
 def health_check():
