@@ -21,4 +21,4 @@ class EventSession(Base):
 
     event = relationship("Event", back_populates="sessions")
     session_seats = relationship("SessionSeat", back_populates="session", cascade="all, delete-orphan")
-    # reservations = relationship("Reservation", back_populates="session")
+    reservations = relationship("Reservation", back_populates="session")

@@ -22,4 +22,4 @@ class User(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     events = relationship("Event", back_populates="organizer")
-    # reservations = relationship("Reservation", back_populates="user")
+    reservations = relationship("Reservation", back_populates="user")

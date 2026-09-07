@@ -22,4 +22,4 @@ class SessionSeat(Base):
 
     session = relationship("EventSession", back_populates="session_seats")
     seat = relationship("Seat", back_populates="session_seats")
-    # reservation_items = relationship("ReservationItem", back_populates="session_seat")
+    reservation_items = relationship("ReservationItem", back_populates="session_seat")
