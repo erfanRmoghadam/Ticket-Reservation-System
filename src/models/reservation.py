@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
 
 from src.connections.database import Base
@@ -19,8 +19,8 @@ class Reservation(Base):
     session_id = Column(Integer, ForeignKey("event_sessions.session_id"), nullable=False)
     status = Column(String(20), default=ReservationStatus.PENDING)
     total_price = Column(Numeric(10, 2), nullable=False)
-    expires_at = Column(TIMESTAMP, nullable=False)
-    created_at = Column(TIMESTAMP, server_default=func.now())
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="reservations")
     session = relationship("EventSession", back_populates="reservations")

@@ -16,3 +16,38 @@ def create_reservation(
     current_user: User = Depends(get_current_user),
 ):
     return ReservationService(db).create(current_user, payload)
+
+
+@router.get("", response_model=list[ReservationResponse])
+def list_my_reservations(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return ReservationService(db).list_by_user(current_user)
+
+
+@router.get("/{reservation_id}", response_model=ReservationResponse)
+def get_reservation(
+    reservation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return ReservationService(db).get_by_id(reservation_id, current_user)
+
+
+@router.patch("/{reservation_id}/confirm", response_model=ReservationResponse)
+def confirm_reservation(
+    reservation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return ReservationService(db).confirm(reservation_id, current_user)
+
+
+@router.delete("/{reservation_id}", response_model=ReservationResponse)
+def cancel_reservation(
+    reservation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return ReservationService(db).cancel(reservation_id, current_user)
