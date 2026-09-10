@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=rect&color=0:0F172A,100:1E3A8A&height=140&text=%F0%9F%8E%9F%EF%B8%8F%20Ticket%20Reservation%20System&fontSize=34&fontColor=ffffff&fontAlignY=55&desc=A%20concurrency-safe%20event%20%26%20venue%20booking%20API&descSize=15&descAlignY=80&descColor=cbd5e1" />
+  <img src="https://capsule-render.vercel.app/api?type=rect&color=0:0F172A,100:1E3A8A&height=140&text=%F0%9F%8E%9F%EF%B8%8F%20Ticket%20Reservation%20System&fontSize=34&fontColor=ffffff&fontAlignY=55&desc=A%20concurrency-safe%20event%20and%20venue%20booking%20API&descSize=15&descAlignY=80&descColor=cbd5e1" />
 </p>
 
 <p align="center">
@@ -261,15 +261,11 @@ Full interactive documentation is served at `/docs` (Swagger UI) and `/redoc` on
 
 ## 🗺️ Roadmap
 
-Planned next, without expanding the project's scope beyond a focused backend portfolio piece:
+Planned next:
 
 - Pagination, multi-field search, and sorting on event/venue listings
-- Automated test suite (Pytest) covering the booking concurrency behavior
 - Global exception handling for consistent error responses
 - A real `/health` check (DB + Redis connectivity)
 - A seed script for demo data
 - CI (GitHub Actions) running tests on every push
 
-## 📜 License
-
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for details.
