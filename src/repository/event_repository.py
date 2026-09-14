@@ -11,20 +11,6 @@ class EventRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    # def list_all_events(
-    #     self,
-    #     category_id: int | None = None,
-    #     city: str | None = None,
-    #     search: str | None = None,
-    # ) -> list[Event]:
-    #     query = self.db.query(Event)
-    #     if category_id:
-    #         query = query.filter(Event.category_id == category_id)
-    #     if search:
-    #         query = query.filter(Event.title.ilike(f"%{search}%"))
-    #     if city:
-    #         query = query.join(Event.venue).filter(Event.venue.has(Venue.city.ilike(f"%{city}%")))
-    #     return query.order_by(Event.created_at.desc()).all()
     def search(
     self,
     category_id: int | None = None,

@@ -1,18 +1,24 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 
 from src.api.deps import get_db
 from src.core.permissions import require_role
 from src.models.user import User, UserRole
 from src.schemas.category import CategoryCreateRequest, CategoryUpdateRequest, CategoryResponse
+from src.schemas.pagination import Page
 from src.services.category_service import CategoryService
 
 router = APIRouter(prefix="/api/categories", tags=["Categories"])
 
 
-@router.get("", response_model=list[CategoryResponse])
-def list_categories(db: Session = Depends(get_db)):
-    return CategoryService(db).list_all()
+@router.get("", response_model=Page[CategoryResponse])
+def list_categories(
+    search: str | None = Query(default=None, description="Matches against name or description"),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    return CategoryService(db).search(search=search, page=page, page_size=page_size)
 
 
 @router.get("/{category_id}", response_model=CategoryResponse)

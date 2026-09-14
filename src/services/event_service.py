@@ -17,9 +17,6 @@ class EventService:
         self.venue_repo = VenueRepository(db)
         self.category_repo = CategoryRepository(db)
 
-    # def list_all(self, category_id: int | None, city: str | None, search: str | None) -> list[Event]:
-    #     return self.repo.list_all_events(category_id=category_id, city=city, search=search)
-
     def search(
     self,
     category_id: int | None,

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 
 from src.api.deps import get_db
@@ -6,14 +6,21 @@ from src.core.permissions import require_role
 from src.models.user import User, UserRole
 from src.schemas.venue import VenueCreateRequest, VenueUpdateRequest, VenueResponse
 from src.schemas.seat import SeatResponse
+from src.schemas.pagination import Page
 from src.services.venue_service import VenueService
 
 router = APIRouter(prefix="/api/venues", tags=["Venues"])
 
 
-@router.get("", response_model=list[VenueResponse])
-def list_venues(db: Session = Depends(get_db)):
-    return VenueService(db).list_all()
+@router.get("", response_model=Page[VenueResponse])
+def list_venues(
+    city: str | None = Query(default=None),
+    search: str | None = Query(default=None, description="Matches against name or address"),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    return VenueService(db).search(city=city, search=search, page=page, page_size=page_size)
 
 
 @router.get("/{venue_id}", response_model=VenueResponse)

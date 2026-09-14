@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from src.models.venue import Venue
 from src.repository.venue_repository import VenueRepository
 from src.schemas.venue import VenueCreateRequest, VenueUpdateRequest
+from src.schemas.pagination import Page
 from src.repository.seat_repository import SeatRepository
 
 
@@ -12,8 +13,10 @@ class VenueService:
         self.repo = VenueRepository(db)
         self.seat_repo = SeatRepository(db)
 
-    def list_all(self) -> list[Venue]:
-        return self.repo.list_all()
+    def search(self, city: str | None, search: str | None, page: int, page_size: int) -> Page:
+        offset = (page - 1) * page_size
+        items, total = self.repo.search(city=city, search=search, offset=offset, limit=page_size)
+        return Page.build(items=items, total=total, page=page, page_size=page_size)
 
     def get_by_id(self, venue_id: int) -> Venue:
         venue = self.repo.get_venue_by_id(venue_id)
