@@ -8,6 +8,7 @@ from src.repository.event_repository import EventRepository
 from src.repository.venue_repository import VenueRepository
 from src.repository.category_repository import CategoryRepository
 from src.schemas.event import EventCreateRequest, EventUpdateRequest
+from src.schemas.pagination import Page
 
 
 class EventService:
@@ -16,8 +17,30 @@ class EventService:
         self.venue_repo = VenueRepository(db)
         self.category_repo = CategoryRepository(db)
 
-    def list_all(self, category_id: int | None, city: str | None, search: str | None) -> list[Event]:
-        return self.repo.list_all_events(category_id=category_id, city=city, search=search)
+    # def list_all(self, category_id: int | None, city: str | None, search: str | None) -> list[Event]:
+    #     return self.repo.list_all_events(category_id=category_id, city=city, search=search)
+
+    def search(
+    self,
+    category_id: int | None,
+    city: str | None,
+    search: str | None,
+    sort_by: str,
+    order: str,
+    page: int,
+    page_size: int,
+) -> Page:
+        offset = (page - 1) * page_size
+        items, total = self.repo.search(
+            category_id=category_id,
+            city=city,
+            search=search,
+            sort_by=sort_by,
+            order=order,
+            offset=offset,
+            limit=page_size,
+        )
+        return Page.build(items=items, total=total, page=page, page_size=page_size)
 
     def get_by_id(self, event_id: int) -> Event:
         event = self.repo.get_event_by_id(event_id)

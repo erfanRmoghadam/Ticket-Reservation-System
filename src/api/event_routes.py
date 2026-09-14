@@ -1,24 +1,38 @@
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
+from typing import Literal
 
 from src.api.deps import get_db, get_current_user
 from src.core.permissions import require_role
 from src.models.user import User, UserRole
 from src.schemas.event import EventCreateRequest, EventUpdateRequest, EventResponse
+from src.schemas.pagination import Page
 from src.services.event_service import EventService
 
 
 router = APIRouter(prefix="/api/events", tags=["Events"])
 
 
-@router.get("", response_model=list[EventResponse])
+@router.get("", response_model=Page[EventResponse])
 def list_events(
     category_id: int | None = Query(default=None),
-    city: str | None = Query(default=None),
-    search: str | None = Query(default=None),
+    city: str | None = Query(default=None, description="Filter by venue city"),
+    search: str | None = Query(default=None, description="Matches against title or description"),
+    sort_by: Literal["created_at", "title"] = Query(default="created_at"),
+    order: Literal["asc", "desc"] = Query(default="desc"),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
-    return EventService(db).list_all(category_id=category_id, city=city, search=search)
+    return EventService(db).search(
+        category_id=category_id,
+        city=city,
+        search=search,
+        sort_by=sort_by,
+        order=order,
+        page=page,
+        page_size=page_size,
+    )
 
 
 @router.get("/{event_id}", response_model=EventResponse)
