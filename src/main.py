@@ -1,4 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+
+from src.api.deps import get_db
+from src.core.health import check_health
 
 from src.api.auth_routes import router as auth_route
 from src.api.user_routes import router as user_route
@@ -28,5 +32,5 @@ app.include_router(session_router)
 app.include_router(reservation_router)
 
 @app.get("/health", tags=["Health"])
-def health_check():
-    return {"status": "ok"}
+def health_check(db: Session = Depends(get_db)):
+    return check_health(db)
