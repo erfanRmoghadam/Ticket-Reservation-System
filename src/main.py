@@ -9,10 +9,14 @@ from src.api.event_routes import router as event_route
 from src.api.session_routes import router as session_router
 from src.api.reservation_routes import router as reservation_router
 
+from src.core.exception_handlers import register_exception_handlers
+
 app = FastAPI(
     title="Ticket Reservation System",
     version="1.0.0"
 )
+
+register_exception_handlers(app)
 
 app.include_router(auth_route)
 app.include_router(user_route)
