@@ -8,7 +8,6 @@
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
   <img src="https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white" />
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white" />
-  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square" />
 </p>
 
 <p align="center">A RESTful ticket reservation API for events and venues — built with FastAPI, PostgreSQL, and Redis.</p>
@@ -45,6 +44,9 @@ This project is a backend-focused implementation of a ticket reservation platfor
 - **Layered architecture.** Routes, business logic, and data access are cleanly separated (`api` → `services` → `repository` → `models`), making each layer independently testable and easy to reason about.
 - **JWT authentication with role-based access.** Three roles (`user`, `organizer`, `admin`) plus ownership checks (an organizer can only edit their own events).
 - **Redis-backed seat map caching** with short-TTL invalidation on every booking action, keeping the seat map close to real-time without WebSockets.
+- **Database-level pagination, search & sorting.** Event, venue and category listings filter, sort, and paginate inside the SQL query itself (not in Python), so response times stay flat as the dataset grows.
+- **Consistent, predictable error responses.** Every error — validation failures, 404s, permission errors, unhandled exceptions — returns the same `{ "error": { "message", "status_code" } }` shape, and unhandled exceptions are logged server-side instead of leaking a stack trace to the client.
+- **Real health monitoring.** `/health` actively pings PostgreSQL and Redis and reports `ok`/`degraded` per dependency, rather than a hardcoded stub.
 
 ## 🛠️ Tech Stack
 
@@ -135,6 +137,7 @@ Ticket-Reservation-System/
 │       ├── database.py
 │       └── redis.py
 │
+├── scripts/                     # Seed script for demo data
 ├── alembic/                     # Database migrations (one revision per feature)
 ├── dockerfile
 ├── docker-compose.yml
@@ -154,6 +157,20 @@ docker compose up --build
 ```
 
 The API will be available at `http://localhost:8000`, with interactive Swagger docs at **`http://localhost:8000/docs`**. Migrations run automatically on container start.
+
+**Optional — load demo data.** To explore the API with real data instead of an empty database, run:
+```bash
+docker compose exec api python -m scripts.seed
+```
+This creates three ready-to-use accounts plus a sample venue, seats, event, and priced session:
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@example.com` | `admin123` |
+| Organizer | `organizer@example.com` | `organizer123` |
+| Buyer | `buyer@example.com` | `buyer123` |
+
+Safe to re-run — existing records are detected and skipped rather than duplicated.
 
 ### 💻 Run Locally
 
@@ -182,6 +199,16 @@ Requires a running local PostgreSQL and Redis instance.
 ## 📡 API Reference
 
 Full interactive documentation is served at `/docs` (Swagger UI) and `/redoc` once the app is running. Summary below.
+
+> **Paginated endpoints** (`GET /api/events`, `GET /api/venues`, `GET /api/categories`) return a consistent envelope instead of a bare array:
+> ```json
+> { "items": [ /* ... */ ], "total": 42, "page": 1, "page_size": 20, "total_pages": 3 }
+> ```
+> **Error responses** (any 4xx/5xx) also follow one shape:
+> ```json
+> { "error": { "message": "Event not found.", "status_code": 404 } }
+> ```
+> Validation errors (422) additionally include a `fields` array with per-field details.
 
 #### 🔑 Authentication — `/api/auth`
 | Method | Endpoint | Description | Auth |
@@ -259,13 +286,25 @@ Full interactive documentation is served at `/docs` (Swagger UI) and `/redoc` on
 
 **Reservation expiry.** Rather than running a background worker (Celery, cron) to sweep expired reservations, expiry is checked lazily: any time a reservation is read, its `expires_at` is compared against the current time, and if it has passed, the reservation is marked `expired` and its seats released in that same request. This keeps the system simpler while still being correct.
 
+**Pagination & search.** Filtering, searching, sorting, counting, and slicing all happen inside the SQL query (`WHERE`, `ORDER BY`, `COUNT`, `OFFSET`/`LIMIT`) rather than fetching every row and processing it in Python — so response time and memory use don't grow with the size of the table.
+
+**Error handling.** Three global exception handlers (`HTTPException`, `RequestValidationError`, and a catch-all `Exception`) normalize every error into one predictable JSON shape. This means API consumers never have to special-case FastAPI's default error format vs. an unexpected 500, and unhandled exceptions are always logged server-side rather than surfacing a raw traceback to the client.
+
+## 🩺 Observability
+
+`GET /health` checks real connectivity to both dependencies rather than returning a hardcoded response:
+```json
+{ "status": "ok", "checks": { "database": "ok", "redis": "ok" } }
+```
+If either PostgreSQL or Redis is unreachable, the affected check reports `"unreachable"` and the overall `status` becomes `"degraded"` — useful for container health checks and uptime monitoring.
+
 ## 🗺️ Roadmap
 
 Planned next:
 
-- Pagination, multi-field search, and sorting on event/venue listings
-- Global exception handling for consistent error responses
-- A real `/health` check (DB + Redis connectivity)
-- A seed script for demo data
+- Pagination, multi-field search, and sorting on event/venue/categories listings ✅
+- Global exception handling for consistent error responses ✅
+- A real `/health` check (DB + Redis connectivity) ✅
+- A seed script for demo data ✅
 - CI (GitHub Actions) running tests on every push
-
+- A lightweight, minimal front-end UI only for demonstrating and interacting with the backend features better
